@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "selenium_automation"
+		},
+		{
+			"path": "playwright_learning"
+		},
+		{
+			"path": "dotnet_automation"
+		},
+		{
+			"path": "api_automation"
+		}
+	],
+	"settings": {}
+}
