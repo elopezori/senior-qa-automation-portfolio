@@ -1,0 +1,22 @@
+
+USER_SCHEMA = {
+    "type": "object",
+    "required": ["id", "name", "username", "email"],
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "name": {
+            "type": "string",
+            "minLength": 1
+        },
+        "username": {
+            "type": "string",
+            "minLength": 1
+        },
+        "email": {
+            "type": "string",
+            "format": "email"
+        }
+    }
+}
