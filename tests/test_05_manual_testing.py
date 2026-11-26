@@ -1,3 +1,4 @@
+﻿
 # ============================================================
 # TEST 05 - AUTOMATIZACION + PRUEBAS MANUALES
 # Proyecto: QA Automation con Playwright y Pytest
@@ -9,79 +10,56 @@ from pages.pagina_login import PaginaLogin
 from pages.pagina_productos import PaginaProductos
 from pages.pagina_carrito import PaginaCarrito
 from pages.detalle_producto import DetalleProducto
-from common.helpers import pausa
 
 
 def test_manual_testing(page):
 
-    # PASO 1: Crear objeto PaginaLogin
+    # PASO 1: LOGIN
     login = PaginaLogin(page)
-
-    # PASO 2: Abrir SauceDemo y realizar login
     login.open()
+    login.login("standard_user", "secret_sauce")
 
-    login.login(
-        "standard_user",
-        "secret_sauce"
-    )
-
-    # PASO 3: Crear objeto PaginaProductos
+    # PASO 2: COMPROBAR PAGINA DE PRODUCTOS
     products = PaginaProductos(page)
+    products.verify_products_page_is_visible()
 
-    # PASO 4: Añadir mochila al carrito
+    # PASO 3: AÑADIR MOCHILA AL CARRITO
     products.add_backpack_to_cart()
+    products.verify_cart_count(1)
 
-    # PASO 5: Comprobar contador del carrito
-    assert products.get_cart_count() == 1
-
-    pausa(page, "Mochila añadida correctamente")
-
-    # PASO 6: Entrar en el carrito
+    # PASO 4: ABRIR CARRITO
     products.open_cart()
 
-    # PASO 7: Crear objeto PaginaCarrito
     cart = PaginaCarrito(page)
+    cart.verify_cart_is_visible()
+    cart.verify_product_count(1)
+    cart.verify_product_is_visible("Sauce Labs Backpack")
 
-    # PASO 8: Comprobar producto en el carrito
-    assert cart.get_product_count() == 1
-
-    assert cart.get_product_name() == "Sauce Labs Backpack"
-
-    pausa(page, "Producto comprobado en el carrito")
-
-    # PASO 9: Volver a la ficha del producto
+    # PASO 5: ABRIR DETALLE DEL PRODUCTO
     cart.open_backpack_details()
 
-    # PASO 10: Crear objeto DetalleProducto
     product_details = DetalleProducto(page)
+    product_details.verify_back_button_visible()
 
-    assert product_details.is_back_button_visible()
-
-    # PASO 11: Volver a todos los productos
+    # PASO 6: VOLVER A PRODUCTOS
     product_details.back_to_products()
+    products.verify_products_page_is_visible()
 
-    # PASO 12: Volver a entrar en el carrito
+    # PASO 7: VOLVER AL CARRITO
     products.open_cart()
 
-    # PASO 13: Eliminar mochila del carrito
+    # PASO 8: ELIMINAR MOCHILA
     cart.remove_backpack_from_cart()
 
-    # PASO 14: Comprobar que el carrito está vacío
-    assert cart.get_product_count() == 0
+    # PASO 9: COMPROBAR CARRITO VACIO
+    cart.verify_cart_is_empty()
+    products.verify_cart_count(0)
 
-    assert products.get_cart_count() == 0
-
-    pausa(page, "Mochila eliminada del carrito")
-
-    # PASO 15: Comienza la fase manual
+    # PASO 10: PREPARAR EXPLORACION MANUAL
     print("\n======================================")
     print("FASE AUTOMATIZADA COMPLETADA")
-    print("AHORA COMIENZA LA PRUEBA MANUAL")
+    print("NAVEGADOR PREPARADO PARA EXPLORACION")
     print("======================================")
 
-    print("\nNAVEGADOR PREPARADO PARA INTERACCION MANUAL")
-
-    pausa(page, "Preparado para pruebas manuales")
-
+    # Descomentar para pausar la ejecución y explorar manualmente:
     # page.pause()
-

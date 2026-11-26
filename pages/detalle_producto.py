@@ -1,9 +1,10 @@
-﻿from common.helpers import pausa
+﻿
+from playwright.sync_api import Page, expect
 
 
 class DetalleProducto:
 
-    def __init__(self, page):
+    def __init__(self, page: Page):
         self.page = page
 
         # SELECTORES
@@ -15,10 +16,8 @@ class DetalleProducto:
 
     def back_to_products(self):
         self.back_to_products_button.click()
-        pausa(self.page, "Volvemos a todos los productos")
 
     # COMPROBACIONES
 
-    def is_back_button_visible(self):
-        return self.back_to_products_button.is_visible()
-
+    def verify_back_button_visible(self):
+        expect(self.back_to_products_button).to_be_visible()

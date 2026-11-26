@@ -7,12 +7,17 @@ from playwright.sync_api import sync_playwright
 def browser():
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=False)
-        yield browser
-        browser.close()
+        try:
+            yield browser
+        finally:
+            browser.close()
 
 
 @pytest.fixture
 def page(browser):
-    page = browser.new_page()
-    yield page
-    page.close()
+    context = browser.new_context()
+    try:
+        page = context.new_page()
+        yield page
+    finally:
+        context.close()

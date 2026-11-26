@@ -1,71 +1,66 @@
 ﻿
 import json
 import html
+import logging
+
 from pathlib import Path
 from datetime import datetime
 
+
+# ============================================================
+# CONFIGURACION
+# ============================================================
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-JSON_FILE = BASE_DIR / "reports" / "results.json"
-HTML_FILE = BASE_DIR / "reports" / "report.html"
+REPORTS_DIR = BASE_DIR / "reports"
+JSON_FILE = REPORTS_DIR / "results.json"
+HTML_FILE = REPORTS_DIR / "report.html"
 
-# Cargar resultados de Pytest
-with open(JSON_FILE, "r", encoding="utf-8") as file:
-    report = json.load(file)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(levelname)s - %(message)s"
+)
 
-tests = report.get("tests", [])
 
-# Obtener información de cada test
+# ============================================================
+# LECTURA DE RESULTADOS
+# ============================================================
+
+def load_results():
+
+    if not JSON_FILE.exists():
+        raise FileNotFoundError(
+            f"No se encuentra el archivo de resultados: {JSON_FILE}. "
+            "Ejecuta primero los tests de Pytest."
+        )
+
+    with JSON_FILE.open("r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+# ============================================================
+# FUNCIONES AUXILIARES
+# ============================================================
+
 def get_outcome(test):
     return test.get("outcome", "unknown").lower()
 
 
 def get_duration(test, phase):
-    return float(test.get(phase, {}).get("duration", 0))
+    phase_data = test.get(phase, {})
+    return float(phase_data.get("duration", 0) or 0)
 
 
 def get_total_duration(test):
-    # Pytest guarda el tiempo por fase.
-    # La suma evita depender de un campo duration inexistente.
     return sum(
         get_duration(test, phase)
         for phase in ("setup", "call", "teardown")
     )
 
 
-passed = sum(get_outcome(t) == "passed" for t in tests)
-failed = sum(get_outcome(t) == "failed" for t in tests)
-skipped = sum(get_outcome(t) == "skipped" for t in tests)
-errors = sum(get_outcome(t) == "error" for t in tests)
+def get_error_details(test):
 
-total = len(tests)
-pass_rate = round((passed / total) * 100, 1) if total else 0
-
-total_duration = sum(get_total_duration(t) for t in tests)
-
-max_duration = max(
-    (get_total_duration(t) for t in tests),
-    default=1
-) or 1
-
-
-# Construir filas de la tabla
-rows = ""
-
-for test in tests:
-    nodeid = html.escape(test.get("nodeid", "Unknown test"))
-    outcome = get_outcome(test)
-    total_time = get_total_duration(test)
-
-    setup_time = get_duration(test, "setup")
-    call_time = get_duration(test, "call")
-    teardown_time = get_duration(test, "teardown")
-
-    status_class = outcome if outcome in (
-        "passed", "failed", "skipped", "error"
-    ) else "unknown"
-
-    # Obtener mensajes de error disponibles
     error_details = []
 
     for phase in ("setup", "call", "teardown"):
@@ -79,72 +74,183 @@ for test in tests:
                 f"{phase.upper()}: {message}"
             )
 
-    error_html = ""
-
-    if error_details:
-        error_text = html.escape("\n".join(error_details))
-        error_html = f"""
-        <details class="error-details">
-            <summary>Ver error</summary>
-            <pre>{error_text}</pre>
-        </details>
-        """
-
-    rows += f"""
-    <tr>
-        <td>
-            <span class="status {status_class}">
-                {html.escape(outcome.upper())}
-            </span>
-        </td>
-        <td class="test-name">
-            {nodeid}
-            {error_html}
-        </td>
-        <td>{setup_time:.2f} s</td>
-        <td>{call_time:.2f} s</td>
-        <td>{teardown_time:.2f} s</td>
-        <td><strong>{total_time:.2f} s</strong></td>
-    </tr>
-    """
+    return error_details
 
 
-# Construir gráficas de duración
-bars = ""
+# ============================================================
+# GENERACION DE ESTADISTICAS
+# ============================================================
 
-for test in tests:
-    name = html.escape(test.get("nodeid", "Unknown test"))
-    seconds = get_total_duration(test)
+def generate_statistics(tests):
 
-    width = seconds / max_duration * 100
-    outcome = get_outcome(test)
+    passed = sum(get_outcome(test) == "passed" for test in tests)
+    failed = sum(get_outcome(test) == "failed" for test in tests)
+    skipped = sum(get_outcome(test) == "skipped" for test in tests)
+    errors = sum(get_outcome(test) == "error" for test in tests)
 
-    color = (
-        "#34d399"
-        if outcome == "passed"
-        else "#f87171"
-        if outcome in ("failed", "error")
-        else "#fbbf24"
+    total = len(tests)
+
+    pass_rate = round(
+        (passed / total) * 100, 1
+    ) if total else 0
+
+    total_duration = sum(
+        get_total_duration(test) for test in tests
     )
 
-    bars += f"""
-    <div class="bar-item">
-        <div class="bar-label">
-            <span>{name}</span>
-            <strong>{seconds:.2f} s</strong>
-        </div>
-        <div class="bar-track">
-            <div class="bar-fill"
-                 style="width:{width}%;background:{color}">
+    return {
+        "total": total,
+        "passed": passed,
+        "failed": failed,
+        "skipped": skipped,
+        "errors": errors,
+        "pass_rate": pass_rate,
+        "total_duration": total_duration
+    }
+
+
+# ============================================================
+# GENERACION DE FILAS HTML
+# ============================================================
+
+def generate_table_rows(tests):
+
+    rows = []
+
+    for test in tests:
+
+        nodeid = html.escape(
+            test.get("nodeid", "Unknown test")
+        )
+
+        outcome = get_outcome(test)
+
+        allowed_statuses = (
+            "passed", "failed", "skipped", "error"
+        )
+
+        status_class = (
+            outcome if outcome in allowed_statuses else "unknown"
+        )
+
+        total_time = get_total_duration(test)
+
+        setup_time = get_duration(test, "setup")
+        call_time = get_duration(test, "call")
+        teardown_time = get_duration(test, "teardown")
+
+        error_details = get_error_details(test)
+
+        error_html = ""
+
+        if error_details:
+            error_text = html.escape(
+                "\n".join(error_details)
+            )
+
+            error_html = f"""
+                <details class="error-details">
+                    <summary>Ver error</summary>
+                    <pre>{error_text}</pre>
+                </details>
+            """
+
+        rows.append(f"""
+            <tr>
+                <td>
+                    <span class="status {status_class}">
+                        {html.escape(outcome.upper())}
+                    </span>
+                </td>
+                <td class="test-name">
+                    {nodeid}
+                    {error_html}
+                </td>
+                <td>{setup_time:.2f} s</td>
+                <td>{call_time:.2f} s</td>
+                <td>{teardown_time:.2f} s</td>
+                <td><strong>{total_time:.2f} s</strong></td>
+            </tr>
+        """)
+
+    if not rows:
+        return '<tr><td colspan="6">No tests found.</td></tr>'
+
+    return "\n".join(rows)
+
+
+# ============================================================
+# GENERACION DE GRAFICAS DE DURACION
+# ============================================================
+
+def generate_duration_bars(tests):
+
+    if not tests:
+        return "<p>No test data available.</p>"
+
+    max_duration = max(
+        (get_total_duration(test) for test in tests),
+        default=0
+    ) or 1
+
+    bars = []
+
+    for test in tests:
+
+        name = html.escape(
+            test.get("nodeid", "Unknown test")
+        )
+
+        seconds = get_total_duration(test)
+
+        width = min(
+            (seconds / max_duration) * 100, 100
+        )
+
+        outcome = get_outcome(test)
+
+        if outcome == "passed":
+            color = "#34d399"
+        elif outcome in ("failed", "error"):
+            color = "#f87171"
+        else:
+            color = "#fbbf24"
+
+        bars.append(f"""
+            <div class="bar-item">
+                <div class="bar-label">
+                    <span>{name}</span>
+                    <strong>{seconds:.2f} s</strong>
+                </div>
+                <div class="bar-track">
+                    <div class="bar-fill"
+                         style="width:{width:.2f}%;background:{color}">
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    """
+        """)
+
+    return "\n".join(bars)
 
 
-generated = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+# ============================================================
+# CONSTRUCCION DEL DASHBOARD
+# ============================================================
 
-html_content = f"""
+def generate_html(report):
+
+    tests = report.get("tests", [])
+
+    stats = generate_statistics(tests)
+
+    rows = generate_table_rows(tests)
+    bars = generate_duration_bars(tests)
+
+    generated = datetime.now().strftime(
+        "%d/%m/%Y %H:%M:%S"
+    )
+
+    html_content = f"""
 <!DOCTYPE html>
 <html lang="es">
 
@@ -229,7 +335,6 @@ h1 {{
 
 .green {{ color: #34d399; }}
 .red {{ color: #f87171; }}
-.yellow {{ color: #fbbf24; }}
 .blue {{ color: #38bdf8; }}
 
 .panels {{
@@ -259,8 +364,8 @@ h3 {{
     height: 155px;
     border-radius: 50%;
     background: conic-gradient(
-        #34d399 0% {pass_rate}%,
-        #f87171 {pass_rate}% 100%
+        #34d399 0% {stats["pass_rate"]}%,
+        #f87171 {stats["pass_rate"]}% 100%
     );
     display: flex;
     align-items: center;
@@ -446,36 +551,34 @@ footer {{
     <div class="badge">● EXECUTION COMPLETED</div>
 </header>
 
-
 <section class="cards">
 
     <div class="card">
         <span>TOTAL TESTS</span>
-        <h2>{total}</h2>
+        <h2>{stats["total"]}</h2>
     </div>
 
     <div class="card">
         <span>PASSED</span>
-        <h2 class="green">{passed}</h2>
+        <h2 class="green">{stats["passed"]}</h2>
     </div>
 
     <div class="card">
         <span>FAILED / ERRORS</span>
-        <h2 class="red">{failed + errors}</h2>
+        <h2 class="red">{stats["failed"] + stats["errors"]}</h2>
     </div>
 
     <div class="card">
         <span>PASS RATE</span>
-        <h2 class="green">{pass_rate}%</h2>
+        <h2 class="green">{stats["pass_rate"]}%</h2>
     </div>
 
     <div class="card">
         <span>TOTAL DURATION</span>
-        <h2 class="blue">{total_duration:.2f} s</h2>
+        <h2 class="blue">{stats["total_duration"]:.2f} s</h2>
     </div>
 
 </section>
-
 
 <section class="panels">
 
@@ -486,7 +589,7 @@ footer {{
 
             <div class="donut">
                 <div class="donut-inner">
-                    <strong>{pass_rate}%</strong>
+                    <strong>{stats["pass_rate"]}%</strong>
                     <small>PASS RATE</small>
                 </div>
             </div>
@@ -494,36 +597,34 @@ footer {{
             <div class="legend">
                 <div>
                     <span class="dot" style="background:#34d399"></span>
-                    Passed: {passed}
+                    Passed: {stats["passed"]}
                 </div>
 
                 <div>
                     <span class="dot" style="background:#f87171"></span>
-                    Failed: {failed}
+                    Failed: {stats["failed"]}
                 </div>
 
                 <div>
                     <span class="dot" style="background:#fbbf24"></span>
-                    Skipped: {skipped}
+                    Skipped: {stats["skipped"]}
                 </div>
 
                 <div>
                     <span class="dot" style="background:#a78bfa"></span>
-                    Errors: {errors}
+                    Errors: {stats["errors"]}
                 </div>
             </div>
 
         </div>
     </div>
 
-
     <div class="panel">
         <h3>Test execution duration</h3>
-        {bars if bars else '<p>No test data available.</p>'}
+        {bars}
     </div>
 
 </section>
-
 
 <section class="panel">
 
@@ -545,7 +646,7 @@ footer {{
             </thead>
 
             <tbody>
-                {rows if rows else '<tr><td colspan="6">No tests found.</td></tr>'}
+                {rows}
             </tbody>
 
         </table>
@@ -554,11 +655,10 @@ footer {{
 
 </section>
 
-
 <footer>
     QA AUTOMATION DASHBOARD
     · Generated: {generated}
-    · Total test duration: {total_duration:.2f} seconds
+    · Total test duration: {stats["total_duration"]:.2f} seconds
 </footer>
 
 </div>
@@ -567,17 +667,54 @@ footer {{
 </html>
 """
 
+    return html_content
 
-# Crear carpeta si no existe y guardar dashboard
-HTML_FILE.parent.mkdir(parents=True, exist_ok=True)
-HTML_FILE.write_text(html_content, encoding="utf-8")
 
-print("\nDashboard generado correctamente:")
-print(HTML_FILE)
+# ============================================================
+# EJECUCION PRINCIPAL
+# ============================================================
 
-print(
-    f"Tests: {total} | Passed: {passed} | "
-    f"Failed: {failed} | Skipped: {skipped}"
-)
+def main():
 
-print(f"Duración total de tests: {total_duration:.2f} segundos")
+    try:
+        report = load_results()
+
+        html_content = generate_html(report)
+
+        REPORTS_DIR.mkdir(
+            parents=True,
+            exist_ok=True
+        )
+
+        HTML_FILE.write_text(
+            html_content,
+            encoding="utf-8"
+        )
+
+        stats = generate_statistics(
+            report.get("tests", [])
+        )
+
+        logging.info("Dashboard generado correctamente.")
+        logging.info("Archivo: %s", HTML_FILE)
+        logging.info(
+            "Tests: %s | Passed: %s | Failed: %s | Skipped: %s",
+            stats["total"],
+            stats["passed"],
+            stats["failed"],
+            stats["skipped"]
+        )
+        logging.info(
+            "Duracion total: %.2f segundos",
+            stats["total_duration"]
+        )
+
+    except (FileNotFoundError, json.JSONDecodeError, OSError) as error:
+        logging.error("%s", error)
+        return 1
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

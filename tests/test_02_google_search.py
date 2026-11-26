@@ -1,12 +1,16 @@
+﻿
 # ============================================================
 # TEST 02 - GOOGLE A SAUCEDEMO
 # Proyecto: QA Automation con Playwright y Pytest
 # Webs: https://www.google.com/ y https://www.saucedemo.com/
 # ============================================================
 
+import re
+
+from playwright.sync_api import expect
+
 from pages.google_page import PaginaGoogle
 from pages.pagina_login import PaginaLogin
-from common.helpers import pausa
 
 
 def test_google_to_saucedemo(page):
@@ -21,8 +25,7 @@ def test_google_to_saucedemo(page):
     google.reject_cookies()
 
     # PASO 4: Comprobar que estamos en Google
-    assert "google.com" in google.get_url()
-    pausa(page, "Google comprobado")
+    expect(page).to_have_url(re.compile(r"google\.com"))
 
     # PASO 5: Crear objeto PaginaLogin
     login = PaginaLogin(page)
@@ -31,12 +34,9 @@ def test_google_to_saucedemo(page):
     login.open()
 
     # PASO 7: Comprobar que estamos en SauceDemo
-    assert "saucedemo.com" in login.get_url()
+    expect(page).to_have_url(re.compile(r"saucedemo\.com"))
 
     # PASO 8: Comprobar que aparece el formulario
     assert login.is_login_form_visible()
 
     print("\nTEST CORRECTO: hemos llegado a SauceDemo")
-
-    # PASO 9: Mantener la página visible
-    pausa(page, "Fin del test")

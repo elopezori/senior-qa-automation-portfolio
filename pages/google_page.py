@@ -1,9 +1,14 @@
-from common.helpers import pausa
+
+import logging
+
+from playwright.sync_api import Page, expect
 
 
 class PaginaGoogle:
 
-    def __init__(self, page):
+    URL = "https://www.google.com"
+
+    def __init__(self, page: Page):
         self.page = page
 
         # SELECTORES
@@ -16,20 +21,22 @@ class PaginaGoogle:
     # ACCIONES
 
     def open(self):
-        self.page.goto("https://www.google.com")
-        pausa(self.page, "Google abierto")
+        self.page.goto(self.URL)
+        logging.info("Google abierto")
 
     def reject_cookies(self):
         try:
             self.reject_cookies_button.click(timeout=3000)
-            pausa(self.page, "Cookies rechazadas")
+            logging.info("Cookies rechazadas")
         except Exception:
-            print("No se ha mostrado el botón de consentimiento")
+            logging.info(
+                "No se ha mostrado el botón de consentimiento"
+            )
 
     def search(self, text):
         self.search_box.fill(text)
         self.search_box.press("Enter")
-        pausa(self.page, "Búsqueda realizada")
+        logging.info("Búsqueda realizada: %s", text)
 
     # COMPROBACIONES
 
@@ -38,3 +45,6 @@ class PaginaGoogle:
 
     def is_search_box_visible(self):
         return self.search_box.is_visible()
+
+    def verify_search_box_visible(self):
+        expect(self.search_box).to_be_visible()

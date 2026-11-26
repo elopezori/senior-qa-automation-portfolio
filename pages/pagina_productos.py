@@ -1,9 +1,10 @@
-from common.helpers import pausa
+
+from playwright.sync_api import Page, expect
 
 
 class PaginaProductos:
 
-    def __init__(self, page):
+    def __init__(self, page: Page):
         self.page = page
 
         # SELECTORES GENERALES
@@ -20,71 +21,48 @@ class PaginaProductos:
 
         # SELECTORES DEL CARRITO
         self.shopping_cart = page.locator(".shopping_cart_link")
-        self.shopping_cart_badge = page.locator(
-            ".shopping_cart_badge"
-        )
-
-        # SELECTORES DE LOS SEIS PRODUCTOS
-        self.backpack = page.locator(
-            '[data-test="add-to-cart-sauce-labs-backpack"]'
-        )
-        self.bike_light = page.locator(
-            '[data-test="add-to-cart-sauce-labs-bike-light"]'
-        )
-        self.bolt_t_shirt = page.locator(
-            '[data-test="add-to-cart-sauce-labs-bolt-t-shirt"]'
-        )
-        self.fleece_jacket = page.locator(
-            '[data-test="add-to-cart-sauce-labs-fleece-jacket"]'
-        )
-        self.onesie = page.locator(
-            '[data-test="add-to-cart-sauce-labs-onesie"]'
-        )
-        self.red_t_shirt = page.locator(
-            '[data-test="add-to-cart-test.allthethings()-t-shirt-(red)"]'
-        )
+        self.shopping_cart_badge = page.locator(".shopping_cart_badge")
 
     # ACCIONES GENERALES
 
     def wait_for_products(self):
-        self.product_list.wait_for(state="visible")
-        pausa(self.page, "Listado de productos visible")
+        expect(self.product_list).to_be_visible()
 
     def open_cart(self):
         self.shopping_cart.click()
-        pausa(self.page, "Carrito abierto")
 
     def select_sort_option(self, option):
         self.sort_dropdown.select_option(option)
-        pausa(self.page, "Productos ordenados")
 
     # AÑADIR PRODUCTOS
 
+    def add_product_to_cart(self, product_id):
+        button = self.page.locator(
+            f'[data-test="add-to-cart-{product_id}"]'
+        )
+        button.click()
+
     def add_backpack_to_cart(self):
-        self.backpack.click()
-        pausa(self.page, "Mochila añadida al carrito")
+        self.add_product_to_cart("sauce-labs-backpack")
 
     def add_bike_light_to_cart(self):
-        self.bike_light.click()
-        pausa(self.page, "Luz de bicicleta añadida al carrito")
+        self.add_product_to_cart("sauce-labs-bike-light")
 
     def add_bolt_t_shirt_to_cart(self):
-        self.bolt_t_shirt.click()
-        pausa(self.page, "Camiseta añadida al carrito")
+        self.add_product_to_cart("sauce-labs-bolt-t-shirt")
 
     def add_fleece_jacket_to_cart(self):
-        self.fleece_jacket.click()
-        pausa(self.page, "Chaqueta añadida al carrito")
+        self.add_product_to_cart("sauce-labs-fleece-jacket")
 
     def add_onesie_to_cart(self):
-        self.onesie.click()
-        pausa(self.page, "Mono añadido al carrito")
+        self.add_product_to_cart("sauce-labs-onesie")
 
     def add_red_t_shirt_to_cart(self):
-        self.red_t_shirt.click()
-        pausa(self.page, "Camiseta roja añadida al carrito")
+        self.add_product_to_cart(
+            "test.allthethings()-t-shirt-(red)"
+        )
 
-    # COMPROBACIONES
+    # CONSULTAS
 
     def get_page_title(self):
         return self.page_title.inner_text()
@@ -101,3 +79,21 @@ class PaginaProductos:
 
         return int(self.shopping_cart_badge.inner_text())
 
+    # VERIFICACIONES
+
+    def verify_products_page_is_visible(self):
+        expect(self.product_list).to_be_visible()
+
+    def verify_products_count(self, expected_count):
+        expect(self.product_items).to_have_count(expected_count)
+
+    def verify_page_title(self):
+        expect(self.page_title).to_have_text("Products")
+
+    def verify_cart_count(self, expected_count):
+        if expected_count == 0:
+            expect(self.shopping_cart_badge).to_have_count(0)
+        else:
+            expect(self.shopping_cart_badge).to_have_text(
+                str(expected_count)
+            )

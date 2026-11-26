@@ -1,10 +1,10 @@
 ﻿
-from common.helpers import pausa
+from playwright.sync_api import Page, expect
 
 
 class PaginaCarrito:
 
-    def __init__(self, page):
+    def __init__(self, page: Page):
         self.page = page
 
         # SELECTORES GENERALES
@@ -16,9 +16,7 @@ class PaginaCarrito:
         self.product_prices = page.locator(
             ".cart_item .inventory_item_price"
         )
-        self.product_quantities = page.locator(
-            ".cart_quantity"
-        )
+        self.product_quantities = page.locator(".cart_quantity")
 
         # BOTONES
         self.continue_shopping_button = page.locator(
@@ -28,68 +26,29 @@ class PaginaCarrito:
             '[data-test="checkout"]'
         )
 
-        # BOTONES PARA ELIMINAR PRODUCTOS
-        self.remove_backpack = page.locator(
-            '[data-test="remove-sauce-labs-backpack"]'
-        )
-        self.remove_bike_light = page.locator(
-            '[data-test="remove-sauce-labs-bike-light"]'
-        )
-        self.remove_bolt_t_shirt = page.locator(
-            '[data-test="remove-sauce-labs-bolt-t-shirt"]'
-        )
-        self.remove_fleece_jacket = page.locator(
-            '[data-test="remove-sauce-labs-fleece-jacket"]'
-        )
-        self.remove_onesie = page.locator(
-            '[data-test="remove-sauce-labs-onesie"]'
-        )
-        self.remove_red_t_shirt = page.locator(
-            '[data-test="remove-test.allthethings()-t-shirt-(red)"]'
-        )
-
     # ACCIONES
 
     def continue_shopping(self):
         self.continue_shopping_button.click()
-        pausa(self.page, "Volvemos a todos los productos")
 
     def checkout(self):
         self.checkout_button.click()
-        pausa(self.page, "Entramos en Checkout")
+
+    def remove_product(self, product_id):
+        remove_button = self.page.locator(
+            f'[data-test="remove-{product_id}"]'
+        )
+        remove_button.click()
 
     def remove_backpack_from_cart(self):
-        self.remove_backpack.click()
-        pausa(self.page, "Mochila eliminada del carrito")
-
-    def remove_bike_light_from_cart(self):
-        self.remove_bike_light.click()
-        pausa(self.page, "Luz de bicicleta eliminada")
-
-    def remove_bolt_t_shirt_from_cart(self):
-        self.remove_bolt_t_shirt.click()
-        pausa(self.page, "Camiseta eliminada del carrito")
-
-    def remove_fleece_jacket_from_cart(self):
-        self.remove_fleece_jacket.click()
-        pausa(self.page, "Chaqueta eliminada del carrito")
-
-    def remove_onesie_from_cart(self):
-        self.remove_onesie.click()
-        pausa(self.page, "Mono eliminado del carrito")
-
-    def remove_red_t_shirt_from_cart(self):
-        self.remove_red_t_shirt.click()
-        pausa(self.page, "Camiseta roja eliminada")
+        self.remove_product("sauce-labs-backpack")
 
     def open_backpack_details(self):
         self.page.locator(
-        '[data-test="item-4-title-link"]'
+            '[data-test="item-4-title-link"]'
         ).click()
 
-        pausa(self.page, "Volvemos al producto Sauce Labs Backpack")
-
-    # COMPROBACIONES
+    # CONSULTAS
 
     def get_product_count(self):
         return self.cart_items.count()
@@ -106,7 +65,18 @@ class PaginaCarrito:
     def get_page_title(self):
         return self.page_title.inner_text()
 
-    def is_backpack_visible(self):
-        return self.page.locator(
-        '[data-test="item-4-title-link"]'
-        ).is_visible()
+    # VALIDACIONES
+
+    def verify_cart_is_visible(self):
+        expect(self.page_title).to_have_text("Your Cart")
+
+    def verify_product_count(self, expected_count):
+        expect(self.cart_items).to_have_count(expected_count)
+
+    def verify_product_is_visible(self, product_name):
+        expect(
+            self.product_names.filter(has_text=product_name)
+        ).to_be_visible()
+
+    def verify_cart_is_empty(self):
+        expect(self.cart_items).to_have_count(0)
