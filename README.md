@@ -1,25 +1,27 @@
-﻿# QA Automation Framework
+# Playwright QA Automation Framework
 
-Framework de automatización de pruebas web desarrollado con **Python, Playwright y Pytest**, siguiendo buenas prácticas de diseño, organización y mantenibilidad del código.
+A Python-based test automation framework built with Playwright and Pytest, following the Page Object Model (POM) design pattern.
 
-Este proyecto forma parte de mi portfolio de QA Automation y demuestra la implementación de una solución de automatización desde su estructura inicial hasta la ejecución de pruebas y generación de informes.
+This project demonstrates practical QA Automation skills, including browser automation, reusable page objects, test organization, logging, automated reporting and PowerShell execution.
 
-El objetivo es construir una arquitectura escalable, reutilizable y fácil de mantener, aplicando conceptos utilizados en proyectos reales de QA Automation.
+## Project Overview
 
-## Tecnologías y herramientas
+The framework automates end-to-end user workflows on [SauceDemo](https://www.saucedemo.com/) and includes browser navigation examples using Google.
 
-- **Python** – Lenguaje de programación.
-- **Playwright** – Automatización de navegadores.
-- **Pytest** – Framework de ejecución y gestión de pruebas.
-- **Page Object Model (POM)** – Patrón de diseño para separar páginas y lógica de pruebas.
-- **Pytest JSON Report** – Generación de resultados estructurados.
-- **HTML5 y CSS3** – Construcción del dashboard de resultados.
-- **PowerShell** – Automatización del proceso de ejecución.
-- **Git** – Control de versiones.
+The main objective is to demonstrate a maintainable automation structure with reusable components, clear test scenarios and automated execution reports.
 
-## Arquitectura del proyecto
+## Tech Stack
 
-El proyecto está organizado por responsabilidades para facilitar la reutilización del código y el mantenimiento de la suite.
+- **Python** – Programming language
+- **Playwright** – Browser automation
+- **Pytest** – Test execution and test organization
+- **Page Object Model (POM)** – Test architecture
+- **pytest-json-report** – Test results in JSON format
+- **HTML / CSS** – Custom test reporting dashboard
+- **PowerShell** – Test execution automation
+- **Git / GitHub** – Version control
+
+## Project Structure
 
 ```text
 playwright_learning/
@@ -31,8 +33,7 @@ playwright_learning/
 ├── MANUAL_QA/
 │   ├── 00_INDICE.md
 │   ├── 01_ENTORNO_VIRTUAL.md
-│   ├── ...
-│   └── 15_CHECKLIST_QA.md
+│   └── ...
 │
 ├── pages/
 │   ├── __init__.py
@@ -61,208 +62,163 @@ playwright_learning/
 └── .gitignore
 ```
 
-## Diseño y organización
+## Framework Architecture
 
-### Page Object Model (POM)
+The project follows the Page Object Model pattern to separate test scenarios from page-specific elements and actions.
 
-La interacción con las páginas web está encapsulada en clases independientes.
+### Pages
 
-Cada Page Object contiene:
+The `pages/` directory contains page objects responsible for:
 
-- Localizadores de los elementos de la interfaz.
-- Métodos para realizar acciones.
-- Métodos de consulta.
-- Verificaciones de estado de la página.
+- Locating web elements.
+- Performing user interactions.
+- Exposing reusable methods.
+- Validating page states and expected results.
 
-Esto permite mantener los tests separados de los detalles de implementación de la interfaz.
+### Tests
 
-### Gestión del navegador y fixtures
+The `tests/` directory contains the automated test scenarios.
 
-La configuración de Pytest se centraliza en `tests/conftest.py`.
+Each test focuses on a specific user workflow and uses the page objects to interact with the application.
 
-Se utilizan fixtures para:
+### Fixtures
 
-- Inicializar Playwright.
-- Gestionar el ciclo de vida del navegador.
-- Crear contextos y páginas independientes para cada test.
-- Garantizar la liberación de recursos mediante `try/finally`.
+The `tests/conftest.py` file provides shared Playwright fixtures.
 
-### Separación de responsabilidades
+The framework creates an isolated browser context for each test and ensures resources are closed after execution.
 
-El proyecto diferencia las siguientes capas:
+### Reporting
 
-- `pages/`: interacción con las páginas web.
-- `tests/`: escenarios y validaciones automatizadas.
-- `common/`: utilidades compartidas.
-- `reporting/`: procesamiento de resultados y generación del dashboard.
-- `MANUAL_QA/`: documentación técnica y procedimientos QA.
+The `reporting/` directory contains the custom HTML report generator.
 
-## Funcionalidades implementadas
+Test results are collected in JSON format using `pytest-json-report` and transformed into an HTML dashboard.
 
-- Automatización de navegación web.
-- Interacción con formularios.
-- Validación de elementos de interfaz.
-- Automatización del inicio de sesión.
-- Gestión del carrito de compra.
-- Verificación de productos añadidos y eliminados.
-- Uso de aserciones de Playwright.
-- Gestión de esperas automáticas.
-- Registro de información mediante logging.
-- Ejecución de pruebas mediante Pytest.
-- Generación de informes JSON.
-- Generación dinámica de un dashboard HTML.
-- Cálculo de estadísticas de ejecución.
-- Automatización del flujo completo mediante PowerShell.
+## Automated Test Scenarios
 
-## Requisitos previos
+The current suite includes five test scenarios:
 
-- Python 3.10 o superior.
-- Git.
-- PowerShell.
-- Visual Studio Code (recomendado).
+| Test | Description |
+|---|---|
+| Test 01 | Open a web page |
+| Test 02 | Navigate from Google to SauceDemo |
+| Test 03 | Validate SauceDemo login |
+| Test 04 | Add a product to the shopping cart |
+| Test 05 | Execute a complete shopping cart workflow |
 
-## Instalación y configuración
+The scenarios cover browser navigation, login validation, product selection, shopping cart operations and product detail navigation.
 
-### 1. Clonar el repositorio
+## Automated Reporting
 
-```powershell
+The framework generates a custom HTML dashboard containing test execution information.
+
+The reporting process includes:
+
+- Total tests executed.
+- Passed, failed and skipped tests.
+- Execution duration.
+- Test-level results.
+- Error details when available.
+
+Generated reports are stored in the `reports/` directory.
+
+## Installation
+
+### Requirements
+
+- Python 3.10 or higher
+- Git
+- PowerShell
+- Visual Studio Code (recommended)
+
+### 1. Clone the repository
+
+```bash
 git clone https://github.com/elopezori/senior-qa-automation-portfolio.git
 ```
 
-Acceder a la carpeta del proyecto:
+### 2. Navigate to the project directory
 
-```powershell
+```bash
 cd senior-qa-automation-portfolio/playwright_learning
 ```
 
-### 2. Crear el entorno virtual
+### 3. Create a virtual environment
 
-```powershell
+```bash
 python -m venv venv
 ```
 
-### 3. Activar el entorno virtual
+### 4. Activate the virtual environment
 
 ```powershell
 .\venv\Scripts\Activate.ps1
 ```
 
-### 4. Instalar dependencias
+### 5. Install dependencies
 
-```powershell
+```bash
 python -m pip install -r requirements.txt
 ```
 
-### 5. Instalar Chromium para Playwright
+### 6. Install Playwright browsers
 
-```powershell
+```bash
 python -m playwright install chromium
 ```
 
-## Ejecución de las pruebas
+## Running the Tests
 
-Para ejecutar la suite completa:
+Execute the PowerShell script from the project directory:
 
 ```powershell
 .\run_tests.ps1
 ```
 
-El script automatiza el siguiente proceso:
+The script automatically:
 
-1. Comprueba la disponibilidad de Python y Pytest.
-2. Prepara la carpeta de informes.
-3. Ejecuta los tests mediante Pytest.
-4. Genera el informe de resultados en JSON.
-5. Ejecuta el generador del dashboard HTML.
-6. Abre automáticamente el informe generado.
-7. Devuelve el código de salida correspondiente al resultado de la ejecución.
+1. Checks Python and Pytest availability.
+2. Prepares the reports directory.
+3. Removes previous JSON test results.
+4. Executes the automated test suite.
+5. Generates the JSON results file.
+6. Creates the HTML dashboard.
+7. Opens the generated report.
 
-## Informes de ejecución
+## Running Tests Manually
 
-Los informes se generan automáticamente en la carpeta `reports/`.
+To execute the complete test suite directly:
 
-| Archivo | Descripción |
-|---|---|
-| `results.json` | Resultados estructurados de Pytest. |
-| `report.html` | Dashboard visual generado a partir de los resultados. |
-
-El dashboard presenta información como:
-
-- Total de pruebas ejecutadas.
-- Pruebas superadas.
-- Pruebas fallidas.
-- Pruebas omitidas.
-- Porcentaje de éxito.
-- Duración de la ejecución.
-- Detalle de los resultados.
-
-Los informes son artefactos generados durante la ejecución y no forman parte del código fuente versionado.
-
-## Ejecución manual de Pytest
-
-También es posible ejecutar los tests directamente:
-
-```powershell
-python -m pytest .\tests -v -s
+```bash
+python -m pytest tests -v
 ```
 
-Generar el informe JSON:
+To execute an individual test:
 
-```powershell
-python -m pytest .\tests -v -s --json-report --json-report-file=reports/results.json
+```bash
+python -m pytest tests/test_03_login.py -v
 ```
 
-Generar el dashboard:
+## Current Project Status
 
-```powershell
-python .\reporting\generate_report.py
-```
+The framework has been executed successfully in a local Windows environment.
 
-Abrir el informe:
+**Latest validated execution:**
 
-```powershell
-Start-Process .\reports\report.html
-```
+- Total tests: 5
+- Passed: 5
+- Failed: 0
+- Skipped: 0
 
-## Estado actual del proyecto
+The project currently focuses on local browser automation and reporting. CI/CD integration is not yet implemented.
 
-**Última ejecución validada:**
+## QA Documentation
 
-| Métrica | Resultado |
-|---|---:|
-| Tests recopilados | 5 |
-| Tests superados | 5 |
-| Tests fallidos | 0 |
-| Tests omitidos | 0 |
-| Tiempo de ejecución | 8.93 segundos |
+The `MANUAL_QA/` directory contains supporting QA documentation, including environment setup, manual testing concepts and testing checklists.
 
-La suite incluye escenarios de navegación, transición entre sitios, autenticación y gestión del carrito.
+This documentation complements the automation framework and demonstrates a broader understanding of software quality assurance.
 
-El test `test_05_manual_testing.py` automatiza un flujo de preparación y deja disponible la opción de pausar el navegador para realizar exploración manual.
+## Author
 
-Estos resultados corresponden a una ejecución local y no representan todavía una integración continua (CI/CD).
+**QA Automation Engineer**
 
-## Documentación QA
-
-El proyecto incluye un manual técnico en `MANUAL_QA/` con documentación sobre:
-
-- Configuración del entorno.
-- Python y entornos virtuales.
-- Playwright y Pytest.
-- Arquitectura y ejecución de pruebas.
-- Generación de informes.
-- PowerShell y Git.
-- Buenas prácticas de QA.
-- Resolución de problemas.
-
-Consulta el [índice del manual QA](MANUAL_QA/00_INDICE.md).
-
-## Objetivo profesional
-
-Este proyecto tiene como objetivo demostrar conocimientos prácticos de automatización de pruebas, diseño de frameworks, organización de código, validación de aplicaciones web y generación de informes.
-
-La prioridad es desarrollar una solución mantenible y ampliable, aplicando criterios de calidad y buenas prácticas de ingeniería de pruebas.
-
-## Autoría
-
-Proyecto personal desarrollado como parte de mi portfolio de QA Automation.
+GitHub: [elopezori](https://github.com/elopezori)
