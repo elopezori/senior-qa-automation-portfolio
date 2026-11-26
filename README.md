@@ -1,6 +1,6 @@
 # Senior QA Automation Portfolio
 
-> Portfolio técnico de **QA Automation Engineer** enfocado en automatización de pruebas, estrategia de calidad y entrega continua.
+> Portfolio técnico de **Senior QA Automation Engineer** con 7 años de experiencia en Quality Assurance, enfocado en automatización de pruebas, diseño de frameworks, estrategia de calidad y entrega continua.
 
 [![C#](https://img.shields.io/badge/C%23-.NET-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![Playwright](https://img.shields.io/badge/Playwright-.NET-2EAD33?logo=playwright&logoColor=white)](https://playwright.dev/dotnet/)
@@ -51,33 +51,54 @@ Los proyectos se incorporarán progresivamente. Cada uno incluirá instrucciones
 - Automatización con C# y Selenium WebDriver.
 - Diseño mantenible de pruebas y sincronización explícita.
 - Gestión de configuración y ejecución en distintos navegadores.
+- Componentes reutilizables y buenas prácticas de automatización.
 
-### 3. API Testing
+### 3. E2E Automation — Cypress
+**Estado:** Planificado
+
+- Automatización E2E utilizando JavaScript y Cypress.
+- Organización de suites de pruebas.
+- Custom Commands y Fixtures.
+- Interceptación y validación de peticiones HTTP.
+- Validación de flujos funcionales.
+- Ejecución de pruebas de regresión.
+
+### 4. API Testing
 **Estado:** Planificado
 
 - Colecciones Postman y entornos.
 - Validación de códigos HTTP, payloads, esquemas y reglas de negocio.
 - Casos positivos, negativos y límites.
+- Validación de respuestas JSON.
 - Automatización de ejecución en CI cuando corresponda.
 
-### 4. Performance Testing — JMeter
+### 5. Performance Testing — JMeter
 **Estado:** Planificado
 
 - Escenarios de carga documentados.
 - Perfiles de usuarios y ramp-up definidos.
 - Métricas, umbrales y análisis de resultados.
+- Pruebas de carga y estrés.
 - Pruebas ejecutadas únicamente contra sistemas autorizados.
 
-### 5. CI/CD — Jenkins
+### 6. CI/CD — Jenkins
 **Estado:** Planificado
 
 - Pipeline de ejecución de pruebas.
 - Publicación de resultados y artefactos.
 - Gestión segura de parámetros y secretos.
 - Criterios de fallo y notificación.
+- Integración de suites de automatización.
+
+### 7. Python — Personal Automation Projects
+**Estado:** Planificado
+
+-Ejercicios prácticos de automatización.
+-Exploración del lenguaje Python.
+-Desarrollo de pequeñas pruebas.
+-Aplicación de conceptos de programación y testing.
 
 ## Enfoque de Quality Engineering
-
 En los proyectos se documentarán, cuando sean relevantes:
 
 - Estrategia de pruebas basada en riesgos.
@@ -88,6 +109,8 @@ En los proyectos se documentarán, cuando sean relevantes:
 - Gestión de defectos y análisis de causa raíz.
 - Accesibilidad y observabilidad de resultados.
 - Mantenibilidad, tiempos de feedback y coste de ejecución.
+- Integración de pruebas en procesos CI/CD.
+- Diseño de frameworks escalables y reutilizables.
 
 ## Estructura
 
@@ -98,7 +121,8 @@ senior-qa-automation-portfolio/
 ├── .gitignore
 ├── ui-automation/
 │   ├── playwright-dotnet/
-│   └── selenium-dotnet/
+│   ├── selenium-dotnet/
+│   └── cypress-javascript/
 ├── api-automation/
 │   ├── postman/
 │   └── dotnet/
@@ -106,6 +130,7 @@ senior-qa-automation-portfolio/
 │   └── jmeter/
 ├── ci-cd/
 │   └── jenkins/
+├── python-projects/
 └── docs/
     ├── architecture.md
     ├── test-strategy.md
