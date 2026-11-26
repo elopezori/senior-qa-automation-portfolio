@@ -10,7 +10,7 @@ public class HomePageTests : BaseTest
     public void HomePage_ShouldDisplayCorrectTitle()
     {
         // Arrange
-        var homePage = new HomePage(Driver);
+        var homePage = new HomePage(Driver, Wait);
 
         // Act
         homePage.Navigate();
