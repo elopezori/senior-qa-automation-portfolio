@@ -181,7 +181,7 @@ senior-qa-automation-portfolio/
 ## Contacto
 
 - **LinkedIn:** [Añade aquí tu perfil]
-- **GitHub:** elopezpri
+- **GitHub:** elopezori
 - **Email profesional:** [Añade aquí tu email, si deseas publicarlo]
 
 ---
