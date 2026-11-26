@@ -1,224 +1,129 @@
-# Playwright QA Automation Framework
+# Senior QA Automation Portfolio
 
-A Python-based test automation framework built with Playwright and Pytest, following the Page Object Model (POM) design pattern.
+> Portfolio técnico de **QA Automation Engineer** enfocado en automatización de pruebas, estrategia de calidad y entrega continua.
 
-This project demonstrates practical QA Automation skills, including browser automation, reusable page objects, test organization, logging, automated reporting and PowerShell execution.
+[![C#](https://img.shields.io/badge/C%23-.NET-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![Playwright](https://img.shields.io/badge/Playwright-.NET-2EAD33?logo=playwright&logoColor=white)](https://playwright.dev/dotnet/)
+[![Selenium](https://img.shields.io/badge/Selenium-WebDriver-43B02A?logo=selenium&logoColor=white)](https://www.selenium.dev/)
+[![Postman](https://img.shields.io/badge/API-Postman-FF6C37?logo=postman&logoColor=white)](https://www.postman.com/)
+[![Jenkins](https://img.shields.io/badge/CI%2FCD-Jenkins-D24939?logo=jenkins&logoColor=white)](https://www.jenkins.io/)
+[![JMeter](https://img.shields.io/badge/Performance-JMeter-D22128?logo=apachejmeter&logoColor=white)](https://jmeter.apache.org/)
 
-## Project Overview
+## Sobre este portfolio
 
-The framework automates end-to-end user workflows on [SauceDemo](https://www.saucedemo.com/) and includes browser navigation examples using Google.
+Este repositorio reúne proyectos prácticos y documentación técnica relacionados con Quality Engineering y QA Automation. El objetivo es mostrar cómo diseño, implemento y mantengo soluciones de testing fiables, mantenibles y alineadas con el riesgo del producto.
 
-The main objective is to demonstrate a maintainable automation structure with reusable components, clear test scenarios and automated execution reports.
+**Perfil objetivo:** Senior QA Automation Engineer  
+**Lenguaje principal:** C#  
+**Idioma de la documentación:** Español
 
-## Tech Stack
+> Personaliza esta sección con tu experiencia real, especialización, sectores y logros verificables antes de publicar el repositorio.
 
-- **Python** – Programming language
-- **Playwright** – Browser automation
-- **Pytest** – Test execution and test organization
-- **Page Object Model (POM)** – Test architecture
-- **pytest-json-report** – Test results in JSON format
-- **HTML / CSS** – Custom test reporting dashboard
-- **PowerShell** – Test execution automation
-- **Git / GitHub** – Version control
+## Stack tecnológico
 
-## Project Structure
+| Área | Tecnologías |
+|---|---|
+| Automatización web principal | Playwright for .NET, C# |
+| Automatización web complementaria | Selenium WebDriver, C# |
+| Automatización E2E complementaria | Cypress (JavaScript/TypeScript) |
+| API testing | Postman; pruebas de API con .NET en desarrollo |
+| CI/CD | Jenkins |
+| Rendimiento | Apache JMeter |
+| Control de versiones | Git y GitHub |
+
+## Proyectos del repositorio
+
+Los proyectos se incorporarán progresivamente. Cada uno incluirá instrucciones para ejecutarlo, alcance, estrategia, estructura, evidencias y limitaciones conocidas.
+
+### 1. UI Automation — Playwright for .NET
+**Estado:** Planificado
+
+- Framework con C# y Playwright.
+- Page Objects o componentes reutilizables cuando aporten valor.
+- Fixtures, configuración por entorno y gestión de datos.
+- Tests Smoke y Regression.
+- Evidencias de ejecución, trazas y reportes.
+- Ejecución automatizada en pipeline.
+
+### 2. UI Automation — Selenium WebDriver
+**Estado:** Planificado
+
+- Automatización con C# y Selenium WebDriver.
+- Diseño mantenible de pruebas y sincronización explícita.
+- Gestión de configuración y ejecución en distintos navegadores.
+
+### 3. API Testing
+**Estado:** Planificado
+
+- Colecciones Postman y entornos.
+- Validación de códigos HTTP, payloads, esquemas y reglas de negocio.
+- Casos positivos, negativos y límites.
+- Automatización de ejecución en CI cuando corresponda.
+
+### 4. Performance Testing — JMeter
+**Estado:** Planificado
+
+- Escenarios de carga documentados.
+- Perfiles de usuarios y ramp-up definidos.
+- Métricas, umbrales y análisis de resultados.
+- Pruebas ejecutadas únicamente contra sistemas autorizados.
+
+### 5. CI/CD — Jenkins
+**Estado:** Planificado
+
+- Pipeline de ejecución de pruebas.
+- Publicación de resultados y artefactos.
+- Gestión segura de parámetros y secretos.
+- Criterios de fallo y notificación.
+
+## Enfoque de Quality Engineering
+
+En los proyectos se documentarán, cuando sean relevantes:
+
+- Estrategia de pruebas basada en riesgos.
+- Pirámide de testing y selección del nivel adecuado.
+- Diseño de casos de prueba y cobertura.
+- Prevención y análisis de pruebas flaky.
+- Trazabilidad entre requisitos, riesgos y pruebas.
+- Gestión de defectos y análisis de causa raíz.
+- Accesibilidad y observabilidad de resultados.
+- Mantenibilidad, tiempos de feedback y coste de ejecución.
+
+## Estructura
 
 ```text
-playwright_learning/
-│
-├── common/
-│   ├── __init__.py
-│   └── helpers.py
-│
-├── MANUAL_QA/
-│   ├── 00_INDICE.md
-│   ├── 01_ENTORNO_VIRTUAL.md
-│   └── ...
-│
-├── pages/
-│   ├── __init__.py
-│   ├── detalle_producto.py
-│   ├── google_page.py
-│   ├── pagina_login.py
-│   ├── pagina_productos.py
-│   ├── pagina_carrito.py
-│   └── pagina_checkout.py
-│
-├── reporting/
-│   ├── __init__.py
-│   └── generate_report.py
-│
-├── tests/
-│   ├── conftest.py
-│   ├── test_01_open_page.py
-│   ├── test_02_google_search.py
-│   ├── test_03_login.py
-│   ├── test_04_add_to_cart.py
-│   └── test_05_manual_testing.py
-│
-├── requirements.txt
-├── run_tests.ps1
+senior-qa-automation-portfolio/
 ├── README.md
-└── .gitignore
+├── LICENSE
+├── .gitignore
+├── ui-automation/
+│   ├── playwright-dotnet/
+│   └── selenium-dotnet/
+├── api-automation/
+│   ├── postman/
+│   └── dotnet/
+├── performance-testing/
+│   └── jmeter/
+├── ci-cd/
+│   └── jenkins/
+└── docs/
+    ├── architecture.md
+    ├── test-strategy.md
+    └── roadmap.md
 ```
 
-## Framework Architecture
+## Documentación
 
-The project follows the Page Object Model pattern to separate test scenarios from page-specific elements and actions.
+- [Arquitectura](docs/architecture.md)
+- [Estrategia de pruebas](docs/test-strategy.md)
+- [Roadmap del portfolio](docs/roadmap.md)
 
-### Pages
+## Contacto
 
-The `pages/` directory contains page objects responsible for:
+- **LinkedIn:** [Añade aquí tu perfil]
+- **GitHub:** [Añade aquí tu usuario]
+- **Email profesional:** [Añade aquí tu email, si deseas publicarlo]
 
-- Locating web elements.
-- Performing user interactions.
-- Exposing reusable methods.
-- Validating page states and expected results.
+---
 
-### Tests
-
-The `tests/` directory contains the automated test scenarios.
-
-Each test focuses on a specific user workflow and uses the page objects to interact with the application.
-
-### Fixtures
-
-The `tests/conftest.py` file provides shared Playwright fixtures.
-
-The framework creates an isolated browser context for each test and ensures resources are closed after execution.
-
-### Reporting
-
-The `reporting/` directory contains the custom HTML report generator.
-
-Test results are collected in JSON format using `pytest-json-report` and transformed into an HTML dashboard.
-
-## Automated Test Scenarios
-
-The current suite includes five test scenarios:
-
-| Test | Description |
-|---|---|
-| Test 01 | Open a web page |
-| Test 02 | Navigate from Google to SauceDemo |
-| Test 03 | Validate SauceDemo login |
-| Test 04 | Add a product to the shopping cart |
-| Test 05 | Execute a complete shopping cart workflow |
-
-The scenarios cover browser navigation, login validation, product selection, shopping cart operations and product detail navigation.
-
-## Automated Reporting
-
-The framework generates a custom HTML dashboard containing test execution information.
-
-The reporting process includes:
-
-- Total tests executed.
-- Passed, failed and skipped tests.
-- Execution duration.
-- Test-level results.
-- Error details when available.
-
-Generated reports are stored in the `reports/` directory.
-
-## Installation
-
-### Requirements
-
-- Python 3.10 or higher
-- Git
-- PowerShell
-- Visual Studio Code (recommended)
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/elopezori/senior-qa-automation-portfolio.git
-```
-
-### 2. Navigate to the project directory
-
-```bash
-cd senior-qa-automation-portfolio/playwright_learning
-```
-
-### 3. Create a virtual environment
-
-```bash
-python -m venv venv
-```
-
-### 4. Activate the virtual environment
-
-```powershell
-.\venv\Scripts\Activate.ps1
-```
-
-### 5. Install dependencies
-
-```bash
-python -m pip install -r requirements.txt
-```
-
-### 6. Install Playwright browsers
-
-```bash
-python -m playwright install chromium
-```
-
-## Running the Tests
-
-Execute the PowerShell script from the project directory:
-
-```powershell
-.\run_tests.ps1
-```
-
-The script automatically:
-
-1. Checks Python and Pytest availability.
-2. Prepares the reports directory.
-3. Removes previous JSON test results.
-4. Executes the automated test suite.
-5. Generates the JSON results file.
-6. Creates the HTML dashboard.
-7. Opens the generated report.
-
-## Running Tests Manually
-
-To execute the complete test suite directly:
-
-```bash
-python -m pytest tests -v
-```
-
-To execute an individual test:
-
-```bash
-python -m pytest tests/test_03_login.py -v
-```
-
-## Current Project Status
-
-The framework has been executed successfully in a local Windows environment.
-
-**Latest validated execution:**
-
-- Total tests: 5
-- Passed: 5
-- Failed: 0
-- Skipped: 0
-
-The project currently focuses on local browser automation and reporting. CI/CD integration is not yet implemented.
-
-## QA Documentation
-
-The `MANUAL_QA/` directory contains supporting QA documentation, including environment setup, manual testing concepts and testing checklists.
-
-This documentation complements the automation framework and demonstrates a broader understanding of software quality assurance.
-
-## Author
-
-**QA Automation Engineer**
-
-GitHub: [elopezori](https://github.com/elopezori)
+Este portfolio es un trabajo en evolución. Los estados de los proyectos se actualizarán a medida que se implementen y validen. No se publicarán credenciales, datos privados ni información confidencial de clientes o empresas.
