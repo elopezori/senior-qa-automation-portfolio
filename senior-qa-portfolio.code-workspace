@@ -1,17 +1,34 @@
+
 {
-	"folders": [
-		{
-			"path": "selenium_automation"
-		},
-		{
-			"path": "playwright_learning"
-		},
-		{
-			"path": "dotnet_automation"
-		},
-		{
-			"path": "api_automation"
-		}
-	],
-	"settings": {}
+    "folders": [
+        {
+            "name": "01 - Selenium CSharp",
+            "path": "01_Automatizacion_Web_Selenium_CSharp"
+        },
+        {
+            "name": "02 - Playwright Python",
+            "path": "02_Automatizacion_Web_Playwright_Python"
+        },
+        {
+            "name": "03 - Playwright DotNet",
+            "path": "03_Automatizacion_Web_Playwright_DotNet"
+        },
+        {
+            "name": "04 - API Python",
+            "path": "04_Automatizacion_API_Python_Requests_Pytest"
+        },
+        {
+            "name": "Documentacion",
+            "path": "docs"
+        }
+    ],
+    "settings": {
+        "python.defaultInterpreterPath": "${workspaceFolder:02 - Playwright Python}/../venv/Scripts/python.exe",
+        "python.testing.pytestEnabled": true,
+        "python.testing.unittestEnabled": false,
+        "python.testing.pytestArgs": [
+            "${workspaceFolder:04 - API Python}/tests"
+        ],
+        "editor.formatOnSave": true
+    }
 }
