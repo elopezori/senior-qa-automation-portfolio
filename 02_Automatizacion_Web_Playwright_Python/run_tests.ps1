@@ -1,135 +1,143 @@
-﻿
 # ============================================================
-# QA AUTOMATION - PLAYWRIGHT TEST RUNNER
-# Ejecucion de Pytest y generacion del dashboard HTML
+# QA AUTOMATION - PLAYWRIGHT PYTHON TEST RUNNER
+# Compatible con Windows y macOS
 # ============================================================
 
-# 1. CONFIGURACION DE RUTAS
+$ErrorActionPreference = "Continue"
 
 Set-Location $PSScriptRoot
 
 $reportsDir = Join-Path $PSScriptRoot "reports"
 $jsonFile = Join-Path $reportsDir "results.json"
 $htmlFile = Join-Path $reportsDir "report.html"
-$reportScript = Join-Path $PSScriptRoot "reporting\generate_report.py"
+$reportScript = Join-Path $PSScriptRoot "reporting/generate_report.py"
 
+# ------------------------------------------------------------
+# 1. DETECTAR PYTHON
+# ------------------------------------------------------------
 
-# 2. COMPROBAR PYTHON
+if ($env:OS -eq "Windows_NT") {
+    $python = Join-Path $PSScriptRoot ".venv/Scripts/python.exe"
+}
+else {
+    $python = Join-Path $PSScriptRoot ".venv/bin/python"
+}
+
+if (-not (Test-Path $python)) {
+    if ($env:OS -eq "Windows_NT") {
+        $pythonCommand = Get-Command python -ErrorAction SilentlyContinue
+    }
+    else {
+        $pythonCommand = Get-Command python3 -ErrorAction SilentlyContinue
+    }
+
+    if ($null -eq $pythonCommand) {
+        Write-Host "ERROR: No se encuentra Python." -ForegroundColor Red
+        exit 1
+    }
+
+    $python = $pythonCommand.Source
+}
 
 Write-Host "`n===================================="
 Write-Host "QA AUTOMATION - PLAYWRIGHT"
-Write-Host "====================================`n"
+Write-Host "===================================="
 
-if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
-    Write-Host "ERROR: Python no esta instalado o no esta disponible en PATH."
-    exit 1
-}
-
-python --version
+& $python --version
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "ERROR: No se pudo ejecutar Python."
+    Write-Host "ERROR: No se pudo ejecutar Python." -ForegroundColor Red
     exit 1
 }
 
+# ------------------------------------------------------------
+# 2. COMPROBAR PYTEST
+# ------------------------------------------------------------
 
-# 3. COMPROBAR PYTEST
-
-Write-Host "`nComprobando Pytest..."
-
-python -m pytest --version
+& $python -m pytest --version
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "ERROR: Pytest no esta instalado."
-    Write-Host "Ejecuta: python -m pip install -r requirements.txt"
+    Write-Host "ERROR: Pytest no está instalado." -ForegroundColor Red
     exit 1
 }
 
-
-# 4. PREPARAR CARPETA DE INFORMES
+# ------------------------------------------------------------
+# 3. PREPARAR INFORMES
+# ------------------------------------------------------------
 
 New-Item -ItemType Directory -Path $reportsDir -Force | Out-Null
-
-# Eliminar resultados anteriores para evitar generar
-# un dashboard con datos de una ejecucion antigua.
 
 if (Test-Path $jsonFile) {
     Remove-Item $jsonFile -Force
 }
 
+# ------------------------------------------------------------
+# 4. EJECUTAR TESTS
+# ------------------------------------------------------------
 
-# 5. EJECUTAR TESTS
+Write-Host "`nINICIANDO TESTS DE PLAYWRIGHT..." -ForegroundColor Cyan
 
-Write-Host "`n===================================="
-Write-Host "INICIANDO TESTS DE PLAYWRIGHT"
-Write-Host "====================================`n"
+$testsDir = Join-Path $PSScriptRoot "tests"
 
-python -m pytest .\tests -v -s --json-report --json-report-file=$jsonFile
+& $python -m pytest $testsDir -v -s --json-report "--json-report-file=$jsonFile"
 
 $pytestExitCode = $LASTEXITCODE
 
-
-# 6. GENERAR DASHBOARD
+# ------------------------------------------------------------
+# 5. GENERAR DASHBOARD HTML
+# ------------------------------------------------------------
 
 if (Test-Path $jsonFile) {
 
-    Write-Host "`n===================================="
-    Write-Host "GENERANDO DASHBOARD HTML"
-    Write-Host "====================================`n"
+    Write-Host "`nGENERANDO DASHBOARD HTML..." -ForegroundColor Cyan
 
-    python $reportScript
-
+    & $python $reportScript
     $reportExitCode = $LASTEXITCODE
 
     if ($reportExitCode -ne 0) {
-        Write-Host "`nERROR: No se pudo generar el dashboard."
+        Write-Host "ERROR: No se pudo generar el dashboard." -ForegroundColor Red
         exit $reportExitCode
     }
 
-    # 7. ABRIR DASHBOARD
+    # --------------------------------------------------------
+    # 6. ABRIR INFORME
+    # --------------------------------------------------------
 
     if (Test-Path $htmlFile) {
 
-        Write-Host "`nDashboard generado correctamente."
-        Write-Host "Abriendo informe HTML..."
+        Write-Host "Dashboard generado correctamente." -ForegroundColor Green
 
-        Start-Process -FilePath $htmlFile
+        if ($env:OS -eq "Windows_NT") {
+            Start-Process -FilePath $htmlFile
+        }
+        elseif ($IsMacOS) {
+            & open $htmlFile
+        }
+        elseif ($IsLinux) {
+            & xdg-open $htmlFile
+        }
 
     }
     else {
-        Write-Host "ERROR: No se encuentra el archivo report.html."
+        Write-Host "ERROR: No se encuentra report.html." -ForegroundColor Red
         exit 1
     }
 
 }
 else {
-
-    Write-Host "`nERROR: No se ha generado results.json."
-
-    if ($pytestExitCode -ne 0) {
-        exit $pytestExitCode
-    }
-
+    Write-Host "ERROR: No se ha generado results.json." -ForegroundColor Red
     exit 1
 }
 
-
-# 8. RESULTADO FINAL
-
-Write-Host "`n===================================="
+# ------------------------------------------------------------
+# 7. RESULTADO FINAL
+# ------------------------------------------------------------
 
 if ($pytestExitCode -eq 0) {
-
-    Write-Host "TODOS LOS TESTS HAN FINALIZADO CORRECTAMENTE."
-
+    Write-Host "`nTODOS LOS TESTS HAN FINALIZADO CORRECTAMENTE." -ForegroundColor Green
 }
 else {
-
-    Write-Host "ATENCION: ALGUNOS TESTS HAN FALLADO."
-    Write-Host "Consulta el dashboard para ver los resultados."
-
+    Write-Host "`nATENCION: ALGUNOS TESTS HAN FALLADO." -ForegroundColor Red
 }
-
-Write-Host "====================================`n"
 
 exit $pytestExitCode
