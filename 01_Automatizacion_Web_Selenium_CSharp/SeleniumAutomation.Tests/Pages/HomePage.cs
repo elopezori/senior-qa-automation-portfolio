@@ -8,6 +8,7 @@ public class HomePage
 {
     private readonly IWebDriver _driver;
     private readonly WebDriverWait _wait;
+    public string ExpectedTitle => "The Internet";
 
     public HomePage(IWebDriver driver, WebDriverWait wait)
     {

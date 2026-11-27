@@ -1,28 +1,77 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Edge;
+using OpenQA.Selenium.Firefox;
 using SeleniumAutomation.Tests.Settings;
 
 namespace SeleniumAutomation.Tests.Configuration;
 
 public static class DriverFactory
 {
-    public static IWebDriver CreateDriver()
+    public static IWebDriver CreateDriver(string browser)
     {
-        if (TestSettings.Browser.Equals("Chrome", StringComparison.OrdinalIgnoreCase))
+        IWebDriver driver = browser.ToLowerInvariant() switch
         {
-            var options = new ChromeOptions();
+            "chrome" => CreateChromeDriver(),
+            "firefox" => CreateFirefoxDriver(),
+            "edge" => CreateEdgeDriver(),
 
-            options.AddArgument("--start-maximized");
+            _ => throw new NotSupportedException(
+                $"Browser '{browser}' is not supported."
+            )
+        };
 
-            if (TestSettings.Headless)
+        try
+        {
+            if (!TestSettings.Headless)
             {
-                options.AddArgument("--headless=new");
+                driver.Manage().Window.Maximize();
             }
 
-            return new ChromeDriver(options);
+            return driver;
         }
+        catch
+        {
+            try
+            {
+                driver.Quit();
+            }
+            finally
+            {
+                driver.Dispose();
+            }
 
-        throw new NotSupportedException(
-            $"Browser '{TestSettings.Browser}' is not supported.");
+            throw;
+        }
+    }
+
+    private static IWebDriver CreateChromeDriver()
+    {
+        var options = new ChromeOptions();
+
+        if (TestSettings.Headless)
+            options.AddArgument("--headless=new");
+
+        return new ChromeDriver(options);
+    }
+
+    private static IWebDriver CreateFirefoxDriver()
+    {
+        var options = new FirefoxOptions();
+
+        if (TestSettings.Headless)
+            options.AddArgument("--headless");
+
+        return new FirefoxDriver(options);
+    }
+
+    private static IWebDriver CreateEdgeDriver()
+    {
+        var options = new EdgeOptions();
+
+        if (TestSettings.Headless)
+            options.AddArgument("--headless=new");
+
+        return new EdgeDriver(options);
     }
 }
